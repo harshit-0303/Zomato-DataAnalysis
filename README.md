@@ -54,10 +54,14 @@ To enhance analysis, I developed an **interactive Power BI dashboard** with:
 - 📈 Visuals for rating distribution, top cuisines, and cost insights  
 - 🏆 Role-based leaderboards (top restaurants by votes, cost, and rating)  
 - ⚡ Drill-throughs for city-wise and locality-wise exploration
+<p align="center">
+  <b>Zomato Power BI Dashboard</b>
+</p>
 
 <p align="center">
   <img src="https://ik.imagekit.io/vtwmik0pw/Screenshot%202025-08-24%20222404.png?updatedAt=1758391459169" alt="Zomato Power BI Dashboard" width="800"/>
 </p> 
+
 ---
 
 ## 🚀 Additional Features  
