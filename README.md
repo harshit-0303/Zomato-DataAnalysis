@@ -89,9 +89,9 @@ An **interactive Power BI dashboard** was built to visualize and explore insight
 
 ## 📂 Project Structure  
 
-Zomato_Dataset_Analysis/
+Zomato_Dataset_Analysis/  
 │
-├── SQL_Queries/ # SQL scripts for detailed analysis
-├── PowerBI_Dashboard/ # .pbix dashboard file
-├── Data/ # Zomato dataset (CSV/Excel format)
+├── SQL_Queries/ # SQL scripts for detailed analysis  
+├── PowerBI_Dashboard/ # .pbix dashboard file  
+├── Data/ # Zomato dataset (CSV/Excel format)  
 └── README.md # Project documentation
