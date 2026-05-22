@@ -212,10 +212,6 @@ Zomato_AI_Analytics/
 │
 ├── workflows/
 │   ├── sql_query_agent.json
-│   ├── insight_generation_agent.json
-│
-├── frontend/
-│   ├── lovable_ui/
 │
 ├── PowerBI_Dashboard/
 │   ├── zomato_dashboard.pbix
@@ -224,11 +220,6 @@ Zomato_AI_Analytics/
 │
 ├── Data/
 │   ├── zomato_data.csv
-│
-├── screenshots/
-│   ├── workflow.png
-│   ├── frontend_ui.png
-│   ├── dashboard.png
 │
 └── README.md
 ```
