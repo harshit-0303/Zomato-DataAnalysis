@@ -1,0 +1,418 @@
+{
+  "name": "ZomatoAnalysis",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mychatapp",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -512,
+        -128
+      ],
+      "id": "4375c4bc-bbe2-4875-a7cb-c06268fb54c8",
+      "name": "Webhook",
+      "webhookId": "c064a713-6d1d-4388-9cdf-7f472d5a7caf"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1328,
+        -192
+      ],
+      "id": "a70ead05-ab3e-41c3-8ae5-156ba024cc06",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        352,
+        32
+      ],
+      "id": "f4f5d9c5-735e-4ad0-84aa-6ad57f2c2807",
+      "name": "Execute a SQL query",
+      "alwaysOutputData": false,
+      "credentials": {
+        "postgres": {
+          "id": "UvBcR8C40mnT50VK",
+          "name": "Postgres account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert PostgreSQL SQL query generator.\n\nYour task is to convert the user's natural language question into EXACTLY ONE valid PostgreSQL SQL query.\n\nSTRICT RULES:\n1. Return ONLY the SQL query.\n2. Do NOT return explanations, notes, comments, markdown, or code blocks.\n3. Generate ONLY one query.\n4. Use ONLY the columns and table provided in the schema.\n5. Use PostgreSQL syntax only.\n6. Never generate DROP, DELETE, TRUNCATE, ALTER, INSERT, UPDATE, CREATE, or REPLACE queries.\n7. Always analyze user intent carefully before generating the query.\n8. Use aggregate functions and GROUP BY whenever required.\n9. Use ORDER BY and LIMIT whenever the user asks for:\n   - top\n   - best\n   - highest\n   - lowest\n   - worst\n   - most\n   - least\n10. Always use NULL-safe logic whenever applicable.\n11. If the question is ambiguous, make the most reasonable assumption based on the schema.\n12. Output must contain ONLY the final SQL query.\n\nTEXT SEARCH RULES:\n1. ALWAYS use ILIKE for text matching.\n2. ALWAYS use wildcard search with % on BOTH sides.\n   Example:\n   column ILIKE '%value%'\n3. For restaurant, city, locality, cuisine, and address searches, ALWAYS support partial matching.\n4. NEVER use exact equality (=) for text fields unless explicitly required.\n5. For multiple keyword searches, combine conditions using OR.\n6. PostgreSQL ILIKE already handles uppercase/lowercase matching, so do NOT use LOWER() or UPPER().\n7. If user searches for a restaurant name, search primarily in:\n   - RestaurantName\n   - Address\n   - Locality\n8. If user searches for food/cuisine, search in:\n   - Cuisines\n9. If user searches for city/location, search in:\n   - City\n   - Locality\n   - LocalityVerbose\n   - Address\n\nFILTERING RULES:\n1. For \"online delivery\":\n   Has_Online_delivery ILIKE 'Yes'\n2. For \"table booking\":\n   Has_Table_booking ILIKE 'Yes'\n3. For \"currently delivering\":\n   Is_delivering_now ILIKE 'Yes'\n\nSORTING RULES:\n1. Best/top restaurants:\n   ORDER BY Rating DESC, Votes DESC\n2. Worst restaurants:\n   ORDER BY Rating ASC, Votes ASC\n3. Most expensive:\n   ORDER BY Average_Cost_for_two DESC\n4. Cheapest:\n   ORDER BY Average_Cost_for_two ASC\n5. Most popular:\n   ORDER BY Votes DESC\n\nDEFAULT LIMIT RULE:\n1. If user asks for recommendations, top, best, famous, popular, highest, lowest, etc.,\n   apply LIMIT 10 unless another limit is specified.\n\nAGGREGATION RULES:\n1. Use COUNT(*) for counts.\n2. Use AVG(Rating) for average ratings.\n3. Use SUM() where totals are needed.\n4. Use GROUP BY whenever non-aggregated columns are selected with aggregates.\n\nTable Name:\nzomato_data\n\nSchema:\nRestaurantID BIGINT\nRestaurantName VARCHAR(255)\nCountryCode INT\nCity VARCHAR(100)\nAddress TEXT\nLocality VARCHAR(255)\nLocalityVerbose TEXT\nCuisines TEXT\nCurrency VARCHAR(100)\nHas_Table_booking VARCHAR(10)\nHas_Online_delivery VARCHAR(10)\nIs_delivering_now VARCHAR(10)\nSwitch_to_order_menu VARCHAR(10)\nPrice_range INT\nVotes INT\nAverage_Cost_for_two INT\nRating DECIMAL(3,2)\n\nUser Question:\n{{ $json.body.message }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -272,
+        -128
+      ],
+      "id": "f6d6400c-9256-4531-8ea7-f652d6ffe0b7",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f6f631e6-1acb-4c94-82a4-53a3aeeb5dce",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "DROP",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "ded38157-0b69-484a-bb48-7d75d6f7ae24",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "DELETE",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "5cf40699-beda-4aac-8a2b-5c040a4a1144",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "TRUNCATE",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "41e8b415-756d-4a47-b9ba-bfe1a88a6376",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "UPDATE",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "86c356f4-f8d0-404a-8d72-f6b629ff06d6",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "INSERT",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "ae0332a2-e8e2-4f7d-99a2-3083d618f36b",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "CREATE",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "51443deb-04e1-4c65-98e0-ee570d4c1721",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "ALTER",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        32,
+        -128
+      ],
+      "id": "ba4d9c79-fb34-4b1a-9fdb-d00b153ced86",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert Data Analyst and Business Intelligence Assistant.\n\nYour task is to analyze SQL query results and return a CLEAN, COMPACT, and STRUCTURED JSON response.\n\nYou will receive:\n1. User's original question\n2. SQL query result data in JSON format\n\nYOUR OBJECTIVE:\n1. Understand the user's intent from the question.\n2. Keep ONLY the columns relevant to the user's request.\n3. Remove unnecessary columns automatically.\n4. Generate concise business insights.\n5. Return everything in ONE structured JSON object.\n\nSTRICT RULES:\n1. Return ONLY valid JSON.\n2. Do NOT return markdown or explanations.\n3. Do NOT hallucinate values not present in data.\n4. If data is empty, clearly mention it.\n5. Keep all insights concise and business-focused.\n6. Summary maximum: 2 lines.\n7. Business insight maximum: 2 lines.\n8. Key insights maximum: 2 lines each.\n9. Keep response lightweight and frontend-friendly.\n10. Include only the most relevant rows if dataset is large.\n11. Preserve ranking/order from SQL results.\n12. If user asks for top/best/worst/popular restaurants, prioritize:\n   - RestaurantName\n   - Rating\n   - Votes\n   - Average_Cost_for_two\n   - Cuisines\n   - City\n13. If user asks location-based queries, prioritize:\n   - City\n   - Locality\n   - Address\n14. If user asks cuisine-related queries, prioritize:\n   - Cuisines\n   - Rating\n   - RestaurantName\n15. If user asks cost-related queries, prioritize:\n   - Average_Cost_for_two\n   - Price_range\n16. Remove technical or unnecessary fields whenever possible.\n\nOUTPUT FORMAT:\n\n{\n  \"user_question\": \"\",\n  \"filtered_results\": [],\n  \"summary\": \"\",\n  \"business_insight\": \"\",\n  \"key_insights\": [\n    \"\",\n    \"\"\n  ]\n}\n\nIMPORTANT FILTERING LOGIC:\n- Keep ONLY essential columns relevant to the question.\n- Reduce payload size.\n- If there are more than 10 rows, return only top 10 most relevant rows.\n- Avoid duplicate or repetitive records.\n- If no useful insights exist, mention that clearly.\n\nUser Question:\n{{ $('Webhook').item.json.body.message }}\n\nSQL Query Results:\n{{ JSON.stringify($json.results) }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        784,
+        32
+      ],
+      "id": "69d32624-048a-461f-a1a7-1ddc0c662287",
+      "name": "AI Agent1",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"user_question\": {\n      \"type\": \"string\"\n    },\n    \"filtered_results\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\"\n      }\n    },\n    \"summary\": {\n      \"type\": \"string\"\n    },\n    \"business_insight\": {\n      \"type\": \"string\"\n    },\n    \"key_insights\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    }\n  },\n  \"required\": [\n    \"user_question\",\n    \"filtered_results\",\n    \"summary\",\n    \"business_insight\",\n    \"key_insights\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1008,
+        256
+      ],
+      "id": "0acda186-3f6b-4be7-89fe-e897c23550a3",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Combine all SQL query rows into a single result array\n\nconst results = $input.all().map(item => item.json);\n\nreturn [\n  {\n    json: {\n      results: results\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        32
+      ],
+      "id": "c6c6066d-9f71-41b1-be2d-8817e8b16c51",
+      "name": "Combine Results"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      error: true,\n      message: \"Unsafe SQL operation detected. Only SELECT queries are allowed.\"\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        -192
+      ],
+      "id": "e197d1f2-d65b-43cc-b438-78a532fafcdf",
+      "name": "Error Handling"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -416,
+        80
+      ],
+      "id": "313ed915-3d8b-4dc9-9d85-3eddda9ca9bc",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "a5AO6vRNdXCaNI61",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        768,
+        272
+      ],
+      "id": "199bf59d-c9d9-4454-ba8e-0604c641eaab",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "dgSHo1bFJhe5u03h",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const analysis = $input.first().json;\n\n// Get SQL results from Combine Results node\nconst sqlResults = $('Combine Results').first().json.results;\n\n// Get original user query\nconst userQuery = $('Webhook').first().json.body.message;\n\nreturn [\n  {\n    json: {\n      query: userQuery,\n\n      total_results: sqlResults.length,\n\n      results: sqlResults,\n\n      analysis: {\n        summary: $input.first().json.output.summary || \"\", \n\n        key_insights: $input.first().json.output.key_insights || [],\n\n          business_analysis:   $input.first().json.output.business_analysis || \"\",\n\n        recommendations: $input.first().json.output.recommendations || [],\n\n        anomalies: $input.first().json.output.anomalies || []\n      }\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1136,
+        32
+      ],
+      "id": "d491905c-5284-4496-a35b-742c81e40fae",
+      "name": "Formatting output"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Error Handling",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Combine Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Formatting output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Results": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Handling": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatting output": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "695187e0-fc95-4231-a41e-f32a428b9109",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1761c0de7b70bb1e4db3c7af305ff80021f5743f8e4e44a389e2091f3c0b1713"
+  },
+  "id": "utLgZ6MiDUp1CRjc",
+  "tags": []
+}
