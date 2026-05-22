@@ -111,6 +111,14 @@ Frontend Visualization
 
 A modern frontend interface was developed using **Lovable** to provide a conversational analytics experience.
 
+<p align="center">
+  <b>Frontend</b>
+</p>
+
+<p align="center">
+  <img src="https://ik.imagekit.io/vtwmik0pw/Screenshot%202026-05-23%20022338.png" alt="Frontend" width="850"/>
+</p>
+
 ## Frontend Highlights
 
 - 💬 Chat-style analytics interface
