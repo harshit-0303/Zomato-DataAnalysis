@@ -73,7 +73,7 @@ The entire AI pipeline is automated using **n8n workflows**.
 </p>
 
 <p align="center">
-  <img src="https://ik.imagekit.io/vtwmik0pw/Screenshot%202026-05-23%20020927.png" alt="n8n Workflow" width="850"/>
+  <img src="https://ik.imagekit.io/vtwmik0pw/Screenshot%202026-05-24%20180359.png" alt="n8n Workflow" width="850"/>
 </p>
 
 ## Workflow Architecture
