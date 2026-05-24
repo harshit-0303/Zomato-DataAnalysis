@@ -119,14 +119,6 @@ A modern frontend interface was developed using **Lovable** to provide a convers
   <img src="https://ik.imagekit.io/vtwmik0pw/Screenshot%202026-05-23%20022338.png" alt="Frontend" width="850"/>
 </p>
 
-<p align="center">
-  <b>Sample Response</b>
-</p>
-
-<p align="center">
-  <img src="https://ik.imagekit.io/vtwmik0pw/Screenshot%202026-05-24%20183344.png" alt="Sample Response" width="850"/>
-</p>
-
 
 ## Frontend Highlights
 
